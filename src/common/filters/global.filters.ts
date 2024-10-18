@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { LoggerService } from '../../lib/logger/logger.service';
 import { ConfigService } from '../../lib/config/config.service';
 
@@ -7,31 +13,34 @@ import { ConfigService } from '../../lib/config/config.service';
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(
     private readonly logger: LoggerService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {}
 
   catch(exception: any, host: ArgumentsHost) {
-      const ctx = host.switchToHttp();
-      const request = ctx.getRequest<Request>();
-      const response = ctx.getResponse<Response>();
+    const ctx = host.switchToHttp();
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
 
-      const method = request.method;
-      const url = request.originalUrl;
-      const now = request['startTime'];
+    const method = request.method;
+    const url = request.originalUrl;
+    const now = request['startTime'];
 
-      const { httpStatus, message} = this.createErrorObj(exception);
+    const { httpStatus, message } = this.createErrorObj(exception);
 
-      this.logger.errorRequest(`${method} ${httpStatus} ${Date.now() - now}ms`,);
+    this.logger.errorRequest(`${method} ${url} ${httpStatus} ${Date.now() - now}ms`);
 
-      const responseBody = {
-        isSuccess: false,
-        status: httpStatus,
-        path: request.originalUrl,
-        message,
-        stack: this.configService.get('NODE_ENV') !== 'production' ? exception.stack : undefined
-      }
+    const responseBody = {
+      isSuccess: false,
+      status: httpStatus,
+      path: request.originalUrl,
+      message,
+      stack:
+        this.configService.get('NODE_ENV') !== 'production'
+          ? exception.stack
+          : undefined,
+    };
 
-      response.status(httpStatus).json(responseBody);
+    response.status(httpStatus).json(responseBody);
   }
 
   createErrorObj(exception: any) {
@@ -47,11 +56,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       httpStatus = HttpStatus.UNAUTHORIZED;
     } else {
       message = 'Internal Server Error';
-      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR
+      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
     return {
-      httpStatus, message,
+      httpStatus,
+      message,
     };
   }
 }

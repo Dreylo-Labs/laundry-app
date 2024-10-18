@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { IConfig } from '../../interfaces/config.interface';
 import { APP_CONFIGURATION } from './configuration';
-import * as Joi from 'joi'; 
-
+import * as Joi from 'joi';
 
 const ConfigSchema = Joi.object<IConfig>({
   NODE_ENV: Joi.string().required(),
   PORT: Joi.number().required(),
   DATABASE_URI: Joi.string().required(),
+  JWT_SECRET_KEY: Joi.string().required(),
+  JWT_AUDIENCE: Joi.string().required(),
+  JWT_EXPIRES_AT: Joi.string().required(),
+  JWT_ISSUER: Joi.string().required(),
 });
-
 
 @Injectable()
 export class ConfigService {

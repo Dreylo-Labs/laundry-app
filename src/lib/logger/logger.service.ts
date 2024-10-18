@@ -15,7 +15,7 @@ export class LoggerService extends Logger {
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.printf((info) => {
           return `[${info.level}]: - ${info.message}`;
-        })
+        }),
       ),
       transports: [
         new winston.transports.File({

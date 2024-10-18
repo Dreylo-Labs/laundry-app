@@ -1,26 +1,34 @@
-import {INestApplication, ValidationPipe, VersioningType,} from '@nestjs/common'
-import { ConfigService } from './lib/config/config.service'
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
+import { ConfigService } from './lib/config/config.service';
 
 export class Server {
   constructor(
     private readonly app: INestApplication,
     private readonly configService: ConfigService,
-  ){}
+  ) {}
 
   static init(app: INestApplication, config: ConfigService) {
     return new Server(app, config);
   }
 
-  configure(){
+  configure() {
     this.app.enableCors({
       allowedHeaders: [
         'Content_Type',
         'content-type',
         'Authorization',
-        'authorization'
+        'authorization',
       ],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      origin: ['http://localhost'],
+      origin: [
+        'http://localhost',
+        'http://localhost:8888',
+        'http://localhost:3000',
+      ],
       credentials: true,
       optionsSuccessStatus: 200,
     });
@@ -38,11 +46,11 @@ export class Server {
         forbidUnknownValues: true,
       }),
     );
-    
+
     return this;
   }
 
   async boot() {
-    await this.app.listen(this.configService.get('PORT'))
+    await this.app.listen(this.configService.get('PORT'));
   }
 }
